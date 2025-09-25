@@ -1,0 +1,47 @@
+Se tiene que usar:
+- Variables y constantes
+- Condicionales
+- Ciclos repetitivos
+- Funciones
+- Vectores matrices
+- strings
+- structs
+- Listas
+- Archivos
+
+Es posible utilizar C++ o C# en caso de querer hacerlo
+
+## HAY QUE HACER UNA PRESENTACION POWERPOINT O ALGO
+
+Requisitos
+- Aplicacion de Consola de comandos
+- Structs obligatorios:
+    - Responsable
+        - string Nombre
+    - Estado
+        - string Estado = "Preparando" | "En progreso" | "Finalizado" 
+    - Tarea
+- Cargar una tarea
+    - ID (automatico)
+    - Persona a cargo
+    - Descripcion
+    - Estado
+- Las tareas se deben guardar en un archivo a parte
+- Busqueda de una tarea:
+    - Lista completa
+    - Filtro por empleado/responsable de la tarea
+- Posibilidad de modificar alguno de los campos de una tarea
+
+
+###### En caso de q sobre tiempo:-
+- listado por estado de urgencica
+    - Struct Tarea
+        - urgencia = "alta" | "media" | "baja"
+    - filtrado de busqueda por estado
+    - como afecta al orden mostrado los estados x tarea
+- fecha de inicio o finalizacion estimada(puede ser meses, periodos u horas)
+- puntuacion a los tecnicos que terminen en tiempo 1 punto, antes 2 puntos, fuera de termino 0. 
+Para luego beneficios de vacaciones, cambio de horarios y demas
+- Varias personas a cargo de una tarea
+- Empleados y sus propios roles
+- Archivo de Empleados
