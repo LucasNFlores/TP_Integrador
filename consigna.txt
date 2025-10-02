@@ -19,7 +19,7 @@ Requisitos
     - Responsable
         - string Nombre
     - Estado
-        - string Estado = "Preparando" | "En progreso" | "Finalizado" 
+        - string Estado = "Pendiente" | "En progreso" | "Finalizado" 
     - Tarea
 - Cargar una tarea
     - ID (automatico)
