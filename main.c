@@ -2,11 +2,25 @@
 #include <string.h>
 #include <stdlib.h> // Necesaria para system("clear") o system("cls")
 
-// --- ESTRUCTURAS (sin cambios) ---
-typedef struct {
-    char estado[20];
-} Estado;
+// --- CONSTANTES Y DEFINICIONES GLOBALES ---
+#define MAX_TAREAS 50
+#define NOMBRE_ARCHIVO "tareas_final.dat" // Archivo para la versión final
 
+// --- DEFINICIÓN DEL ENUM Y SU "TRADUCTOR" A TEXTO ---
+typedef enum {
+    PENDIENTE,      // Valor 0
+    EN_PROGRESO,    // Valor 1
+    FINALIZADO      // Valor 2
+} EstadoTarea;
+
+// Array de strings que corresponde a los valores del enum (en el mismo orden)
+const char* estadoStrings[] = {
+    "Pendiente",
+    "En progreso",
+    "Finalizado"
+};
+
+// --- ESTRUCTURAS DE DATOS ---
 typedef struct {
     char nombre[50];
     char apellido[50];
@@ -17,17 +31,14 @@ typedef struct {
     char codigo[5];
     char descripcion[256];
     Responsable responsable;
-    Estado estado;
+    EstadoTarea estado; // El estado ahora es un enum, no un char[]
 } Tarea;
 
-// --- CONSTANTES Y GLOBALES ---
-#define MAX_TAREAS 50
-#define NOMBRE_ARCHIVO "tareas.dat"
-
-// --- PROTOTIPOS DE FUNCIONES ---
+// --- PROTOTIPOS DE FUNCIONES (Índice del programa) ---
 void limpiarBuffer();
 void limpiarPantalla();
 void presioneParaContinuar();
+const char* obtenerStringDeEstado(EstadoTarea estado);
 void cargarUnaTarea(Tarea *tarea);
 void mostrarTareas(Tarea lista[], int numTareas);
 void buscarPorResponsable(Tarea lista[], int numTareas);
@@ -36,20 +47,20 @@ void guardarTareasEnArchivo(Tarea lista[], int numTareas);
 int cargarTareasDesdeArchivo(Tarea lista[]);
 int mostrarMenu();
 
-
+// --- FUNCIÓN PRINCIPAL ---
 int main() {
     Tarea listaDeTareas[MAX_TAREAS];
     int tareasCargadas = 0;
     int opcion = 0;
 
-    // Al iniciar, intentamos cargar las tareas desde el archivo
+    // Al iniciar, cargamos las tareas guardadas en el archivo
     tareasCargadas = cargarTareasDesdeArchivo(listaDeTareas);
 
     do {
         opcion = mostrarMenu();
 
         switch (opcion) {
-            case 1:
+            case 1: // Cargar Tarea
                 if (tareasCargadas < MAX_TAREAS) {
                     printf("\n--- Cargando Nueva Tarea ---\n");
                     cargarUnaTarea(&listaDeTareas[tareasCargadas]);
@@ -60,19 +71,19 @@ int main() {
                 }
                 presioneParaContinuar();
                 break;
-            case 2:
+            case 2: // Mostrar Tareas
                 mostrarTareas(listaDeTareas, tareasCargadas);
                 presioneParaContinuar();
                 break;
-            case 3:
+            case 3: // Buscar por Responsable
                 buscarPorResponsable(listaDeTareas, tareasCargadas);
                 presioneParaContinuar();
                 break;
-            case 4:
+            case 4: // Cambiar Estado
                 cambiarEstadoTarea(listaDeTareas, tareasCargadas);
                 presioneParaContinuar();
                 break;
-            case 5:
+            case 5: // Guardar y Salir
                 guardarTareasEnArchivo(listaDeTareas, tareasCargadas);
                 printf("\n¡Tareas guardadas correctamente! Saliendo del programa...\n\n");
                 break;
@@ -85,13 +96,13 @@ int main() {
     return 0;
 }
 
-// --- IMPLEMENTACIÓN DE FUNCIONES ---
+// --- IMPLEMENTACIÓN DE LAS FUNCIONES ---
 
 int mostrarMenu() {
     int opcion;
     limpiarPantalla();
     printf("=================================\n");
-    printf("      GESTOR DE TAREAS v1.0\n");
+    printf("      GESTOR DE TAREAS v2.0\n");
     printf("=================================\n");
     printf("1. Cargar Nueva Tarea\n");
     printf("2. Mostrar Todas las Tareas\n");
@@ -105,129 +116,17 @@ int mostrarMenu() {
     return opcion;
 }
 
-void buscarPorResponsable(Tarea lista[], int numTareas) {
-    char nombreBusqueda[50];
-    int encontradas = 0;
-    
-    printf("\n--- Buscar Tareas por Responsable ---\n");
-    printf("Ingrese el nombre del responsable a buscar: ");
-    fgets(nombreBusqueda, sizeof(nombreBusqueda), stdin);
-    nombreBusqueda[strcspn(nombreBusqueda, "\n")] = 0; // Limpiar newline
-
-    printf("\nResultados de la busqueda para '%s':\n", nombreBusqueda);
-    printf("-------------------------------------------\n");
-
-    for (int i = 0; i < numTareas; i++) {
-        // Usamos strcasecmp para ignorar mayúsculas/minúsculas.
-        // Si no funciona en tu compilador, usa strcmp.
-        if (strcasecmp(lista[i].responsable.nombre, nombreBusqueda) == 0) {
-            printf("  Codigo: %s\n", lista[i].codigo);
-            printf("  Descripcion: %s\n", lista[i].descripcion);
-            printf("  Estado: %s\n", lista[i].estado.estado);
-            printf("-------------------------------------------\n");
-            encontradas++;
-        }
-    }
-
-    if (encontradas == 0) {
-        printf("No se encontraron tareas para ese responsable.\n");
-    }
-}
-
-void cambiarEstadoTarea(Tarea lista[], int numTareas) {
-    char codigoBusqueda[5];
-    int indiceEncontrado = -1;
-
-    printf("\n--- Cambiar Estado de una Tarea ---\n");
-    if (numTareas == 0) {
-        printf("No hay tareas para modificar.\n");
-        return;
-    }
-    
-    // Mostramos las tareas para que el usuario elija
-    mostrarTareas(lista, numTareas);
-    
-    printf("\nIngrese el codigo de la tarea a modificar: ");
-    fgets(codigoBusqueda, sizeof(codigoBusqueda), stdin);
-    codigoBusqueda[strcspn(codigoBusqueda, "\n")] = 0;
-
-    for (int i = 0; i < numTareas; i++) {
-        if (strcmp(lista[i].codigo, codigoBusqueda) == 0) {
-            indiceEncontrado = i;
-            break;
-        }
-    }
-
-    if (indiceEncontrado != -1) {
-        printf("Tarea encontrada. Ingrese el nuevo estado: ");
-        fgets(lista[indiceEncontrado].estado.estado, sizeof(lista[indiceEncontrado].estado.estado), stdin);
-        lista[indiceEncontrado].estado.estado[strcspn(lista[indiceEncontrado].estado.estado, "\n")] = 0;
-        printf("\n¡Estado actualizado con éxito!\n");
-    } else {
-        printf("\nNo se encontró ninguna tarea con el código '%s'.\n", codigoBusqueda);
-    }
-}
-
-// --- FUNCIONES DE PERSISTENCIA EN ARCHIVO ---
-
-void guardarTareasEnArchivo(Tarea lista[], int numTareas) {
-    FILE *archivo = fopen(NOMBRE_ARCHIVO, "wb"); // "wb" -> Write Binary
-    if (archivo == NULL) {
-        printf("Error: No se pudo abrir el archivo para guardar.\n");
-        return;
-    }
-
-    // Escribimos todo el array de tareas en el archivo de una sola vez
-    fwrite(lista, sizeof(Tarea), numTareas, archivo);
-    
-    fclose(archivo);
-}
-
-int cargarTareasDesdeArchivo(Tarea lista[]) {
-    FILE *archivo = fopen(NOMBRE_ARCHIVO, "rb"); // "rb" -> Read Binary
-    int numTareas = 0;
-    if (archivo == NULL) {
-        // Si el archivo no existe, es la primera vez que se ejecuta. No es un error.
-        printf("Archivo de tareas no encontrado. Se creará uno nuevo al guardar.\n");
-        presioneParaContinuar();
-        return 0;
-    }
-
-    // Leemos del archivo y guardamos en el array hasta que no haya más que leer
-    while (fread(&lista[numTareas], sizeof(Tarea), 1, archivo) == 1 && numTareas < MAX_TAREAS) {
-        numTareas++;
-    }
-
-    fclose(archivo);
-    return numTareas;
-}
-
-
-// --- FUNCIONES AUXILIARES (mejoradas/existentes) ---
-
-void limpiarBuffer() {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF);
-}
-
-void limpiarPantalla() {
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
-}
-
-void presioneParaContinuar() {
-    printf("\nPresione Enter para continuar...");
-    getchar();
+const char* obtenerStringDeEstado(EstadoTarea estado) {
+    // Devuelve el texto correspondiente del array global
+    return estadoStrings[estado];
 }
 
 void cargarUnaTarea(Tarea *tarea) {
-    // Esta función es la misma del encuentro anterior
+    int opcionEstado = 0;
+
     printf("Ingrese el codigo de la tarea (ej: T01): ");
     fgets(tarea->codigo, sizeof(tarea->codigo), stdin);
-    tarea->codigo[strcspn(tarea->codigo, "\n")] = 0; 
+    tarea->codigo[strcspn(tarea->codigo, "\n")] = 0;
 
     printf("Ingrese la descripcion: ");
     fgets(tarea->descripcion, sizeof(tarea->descripcion), stdin);
@@ -245,13 +144,26 @@ void cargarUnaTarea(Tarea *tarea) {
     scanf("%d", &tarea->responsable.legajo);
     limpiarBuffer();
 
-    printf("Ingrese el estado de la tarea (ej: Pendiente): ");
-    fgets(tarea->estado.estado, sizeof(tarea->estado.estado), stdin);
-    tarea->estado.estado[strcspn(tarea->estado.estado, "\n")] = 0;
+    // Bucle para forzar al usuario a elegir una opción de estado válida
+    do {
+        printf("Seleccione el estado de la tarea:\n");
+        printf("  1. %s\n", estadoStrings[PENDIENTE]);
+        printf("  2. %s\n", estadoStrings[EN_PROGRESO]);
+        printf("  3. %s\n", estadoStrings[FINALIZADO]);
+        printf("Opcion: ");
+        scanf("%d", &opcionEstado);
+        limpiarBuffer();
+
+        if (opcionEstado < 1 || opcionEstado > 3) {
+            printf("Opción inválida. Por favor, elija 1, 2 o 3.\n");
+        }
+    } while (opcionEstado < 1 || opcionEstado > 3);
+
+    // Convertimos la opción del usuario (1, 2, 3) al valor del enum (0, 1, 2)
+    tarea->estado = (EstadoTarea)(opcionEstado - 1);
 }
 
 void mostrarTareas(Tarea lista[], int numTareas) {
-    // Misma función del encuentro anterior
     limpiarPantalla();
     printf("\n--- LISTADO GENERAL DE TAREAS ---\n");
     if (numTareas == 0) {
@@ -263,7 +175,128 @@ void mostrarTareas(Tarea lista[], int numTareas) {
         printf("  Codigo: %s\n", lista[i].codigo);
         printf("  Descripcion: %s\n", lista[i].descripcion);
         printf("  Responsable: %s %s (Legajo: %d)\n", lista[i].responsable.nombre, lista[i].responsable.apellido, lista[i].responsable.legajo);
-        printf("  Estado: %s\n", lista[i].estado.estado);
+        printf("  Estado: %s\n", obtenerStringDeEstado(lista[i].estado)); // Usamos la función "traductora"
     }
     printf("----------------------------------\n");
+}
+
+void buscarPorResponsable(Tarea lista[], int numTareas) {
+    char nombreBusqueda[50];
+    int encontradas = 0;
+    
+    printf("\n--- Buscar Tareas por Responsable ---\n");
+    printf("Ingrese el nombre del responsable a buscar: ");
+    fgets(nombreBusqueda, sizeof(nombreBusqueda), stdin);
+    nombreBusqueda[strcspn(nombreBusqueda, "\n")] = 0;
+
+    printf("\nResultados de la busqueda para '%s':\n", nombreBusqueda);
+    printf("-------------------------------------------\n");
+
+    for (int i = 0; i < numTareas; i++) {
+        // Usamos strcasecmp para ignorar mayúsculas/minúsculas.
+        // Si no funciona en tu compilador (ej: en Windows), puedes usar strcmp.
+        if (strcasecmp(lista[i].responsable.nombre, nombreBusqueda) == 0) {
+            printf("  Codigo: %s\n", lista[i].codigo);
+            printf("  Descripcion: %s\n", lista[i].descripcion);
+            printf("  Estado: %s\n", obtenerStringDeEstado(lista[i].estado));
+            printf("-------------------------------------------\n");
+            encontradas++;
+        }
+    }
+
+    if (encontradas == 0) {
+        printf("No se encontraron tareas para ese responsable.\n");
+    }
+}
+
+void cambiarEstadoTarea(Tarea lista[], int numTareas) {
+    char codigoBusqueda[5];
+    int indiceEncontrado = -1;
+    int opcionEstado = 0;
+
+    printf("\n--- Cambiar Estado de una Tarea ---\n");
+    if (numTareas == 0) {
+        printf("No hay tareas para modificar.\n");
+        return;
+    }
+    
+    mostrarTareas(lista, numTareas);
+    
+    printf("\nIngrese el codigo de la tarea a modificar: ");
+    fgets(codigoBusqueda, sizeof(codigoBusqueda), stdin);
+    codigoBusqueda[strcspn(codigoBusqueda, "\n")] = 0;
+
+    for (int i = 0; i < numTareas; i++) {
+        if (strcmp(lista[i].codigo, codigoBusqueda) == 0) {
+            indiceEncontrado = i;
+            break;
+        }
+    }
+
+    if (indiceEncontrado != -1) {
+        do {
+            printf("Seleccione el nuevo estado para la tarea '%s':\n", lista[indiceEncontrado].codigo);
+            printf("  1. %s\n", estadoStrings[PENDIENTE]);
+            printf("  2. %s\n", estadoStrings[EN_PROGRESO]);
+            printf("  3. %s\n", estadoStrings[FINALIZADO]);
+            printf("Opcion: ");
+            scanf("%d", &opcionEstado);
+            limpiarBuffer();
+            if (opcionEstado < 1 || opcionEstado > 3) {
+                printf("Opción inválida.\n");
+            }
+        } while (opcionEstado < 1 || opcionEstado > 3);
+        
+        lista[indiceEncontrado].estado = (EstadoTarea)(opcionEstado - 1);
+        printf("\n¡Estado actualizado con éxito!\n");
+    } else {
+        printf("\nNo se encontró ninguna tarea con el código '%s'.\n", codigoBusqueda);
+    }
+}
+
+// --- FUNCIONES DE ARCHIVO (PERSISTENCIA) ---
+
+void guardarTareasEnArchivo(Tarea lista[], int numTareas) {
+    FILE *archivo = fopen(NOMBRE_ARCHIVO, "wb"); // "wb" -> Write Binary
+    if (archivo == NULL) {
+        printf("Error: No se pudo abrir el archivo para guardar.\n");
+        return;
+    }
+    fwrite(lista, sizeof(Tarea), numTareas, archivo);
+    fclose(archivo);
+}
+
+int cargarTareasDesdeArchivo(Tarea lista[]) {
+    FILE *archivo = fopen(NOMBRE_ARCHIVO, "rb"); // "rb" -> Read Binary
+    int numTareas = 0;
+    if (archivo == NULL) {
+        printf("Archivo de tareas no encontrado. Se creará uno nuevo al guardar.\n");
+        presioneParaContinuar();
+        return 0;
+    }
+    while (numTareas < MAX_TAREAS && fread(&lista[numTareas], sizeof(Tarea), 1, archivo) == 1) {
+        numTareas++;
+    }
+    fclose(archivo);
+    return numTareas;
+}
+
+// --- FUNCIONES AUXILIARES (UTILIDADES) ---
+
+void limpiarBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+void limpiarPantalla() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+}
+
+void presioneParaContinuar() {
+    printf("\nPresione Enter para continuar...");
+    getchar();
 }
