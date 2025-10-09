@@ -257,7 +257,7 @@ void cambiarEstadoTarea(Tarea lista[], int numTareas) {
 // --- FUNCIONES DE ARCHIVO (PERSISTENCIA) ---
 
 void guardarTareasEnArchivo(Tarea lista[], int numTareas) {
-    FILE *archivo = fopen(NOMBRE_ARCHIVO, "wb"); // "wb" -> Write Binary
+    FILE *archivo = fopen(NOMBRE_ARCHIVO, "wb"); // "wb" = Write Binary
     if (archivo == NULL) {
         printf("Error: No se pudo abrir el archivo para guardar.\n");
         return;
@@ -267,7 +267,7 @@ void guardarTareasEnArchivo(Tarea lista[], int numTareas) {
 }
 
 int cargarTareasDesdeArchivo(Tarea lista[]) {
-    FILE *archivo = fopen(NOMBRE_ARCHIVO, "rb"); // "rb" -> Read Binary
+    FILE *archivo = fopen(NOMBRE_ARCHIVO, "rb"); // "rb" = Read Binary
     int numTareas = 0;
     if (archivo == NULL) {
         printf("Archivo de tareas no encontrado. Se creará uno nuevo al guardar.\n");
