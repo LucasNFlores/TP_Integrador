@@ -154,13 +154,20 @@ void cambiarEstadoTarea(Tarea lista[], int numTareas) {
     fgets(codigoBusqueda, sizeof(codigoBusqueda), stdin);
     codigoBusqueda[strcspn(codigoBusqueda, "\n")] = 0;
 
+    // Recorremos todas las tareas hasta encontrar la buscada 
     for (int i = 0; i < numTareas; i++) {
+
+        // strcmp compara 2 cadenas de texto en este caso:
+        // "lista[i].codigo" y "codigoBusqueda" si son iguales da 0
         if (strcmp(lista[i].codigo, codigoBusqueda) == 0) {
+            
+            // si encontramos la tarea guardamos el indice de la misma (de la lista)
             indiceEncontrado = i;
             break;
         }
     }
 
+    // Si hay un resultado de la busqueda
     if (indiceEncontrado != -1) {
         // variables para el mensaje del cambio
         char estadoAnterior[20];
