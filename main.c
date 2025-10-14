@@ -111,6 +111,7 @@ void buscarPorResponsable(Tarea lista[], int numTareas) {
     
     printf("\n--- Buscar Tareas por Responsable ---\n");
     printf("Ingrese el nombre del responsable a buscar: ");
+
     fgets(nombreBusqueda, sizeof(nombreBusqueda), stdin);
     nombreBusqueda[strcspn(nombreBusqueda, "\n")] = 0; // Limpiar newline
 
@@ -203,13 +204,18 @@ int cargarTareasDesdeArchivo(Tarea lista[]) {
 }
 
 
-// --- FUNCIONES AUXILIARES (mejoradas/existentes) ---
+// --- FUNCIONES AUXILIARES ---
 
 void limpiarBuffer() {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF);
+    int basura; // Declara una variable para guardar un carácter
+    
+    // Inicia un bucle que se repite MIENTRAS se cumplan dos condiciones
+    while ((basura = getchar()) != '\n' && basura != EOF); 
+    // se obtiene con getchar si quedo algo "en el aire"
+    // en caso de no ser \n y NO ser EOF ("fin del archivo")
 }
 
+// funcion para limpiar pantalla de la consola, dependiendo del SO que se tenga va a usar cls (windows) o clear(linux)
 void limpiarPantalla() {
     #ifdef _WIN32
         system("cls");
@@ -224,9 +230,11 @@ void presioneParaContinuar() {
 }
 
 void cargarUnaTarea(Tarea *tarea) {
-    // Esta función es la misma del encuentro anterior
+
     printf("Ingrese el codigo de la tarea (ej: T01): ");
+    // se utiliza fgets porque obtiene todo lo que el usuario ingresa hasta apretar ENTER (contrario a scanf que lee hasta donde hay un espacio " ")
     fgets(tarea->codigo, sizeof(tarea->codigo), stdin);
+    //asignamos con strcspn a donde apuntaria (en este caso el codigo de la tarea) y eliminar el salto de línea (\n) que fgets agrega al final del texto.
     tarea->codigo[strcspn(tarea->codigo, "\n")] = 0; 
 
     printf("Ingrese la descripcion: ");
@@ -243,6 +251,7 @@ void cargarUnaTarea(Tarea *tarea) {
 
     printf("Ingrese el legajo del responsable: ");
     scanf("%d", &tarea->responsable.legajo);
+    // igual que arriba con limpiar buffer eliminamos el \n que agrega scanf
     limpiarBuffer();
 
     printf("Ingrese el estado de la tarea (ej: Pendiente): ");
@@ -251,7 +260,7 @@ void cargarUnaTarea(Tarea *tarea) {
 }
 
 void mostrarTareas(Tarea lista[], int numTareas) {
-    // Misma función del encuentro anterior
+
     limpiarPantalla();
     printf("\n--- LISTADO GENERAL DE TAREAS ---\n");
     if (numTareas == 0) {
