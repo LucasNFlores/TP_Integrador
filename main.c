@@ -177,7 +177,7 @@ void cambiarEstadoTarea(Tarea lista[], int numTareas) {
         strcpy(estadoNuevo, lista[indiceEncontrado].estado.estado);
 
         // mostramos el estado nuevo
-        printf("\nSe cambio el estado de '%s'-> %s\n", estadoAnterior, estadoNuevo);
+        printf("\nSe cambio el estado de '%s'-> '%s'\n", estadoAnterior, estadoNuevo);
     } else {
         printf("\nNo se encontró ninguna tarea con el código '%s'.\n", codigoBusqueda);
     }
