@@ -137,11 +137,13 @@ void buscarPorResponsable(Tarea lista[], int numTareas) {
 
 void cambiarEstadoTarea(Tarea lista[], int numTareas) {
     char codigoBusqueda[5];
+    // en -1 porque no hay una tarea encontrada
     int indiceEncontrado = -1;
 
     printf("\n--- Cambiar Estado de una Tarea ---\n");
+    // se comprueba si hay tareas existentes
     if (numTareas == 0) {
-        printf("No hay tareas para modificar.\n");
+        printf("No hay tareas existentes aun.\n");
         return;
     }
     
@@ -160,10 +162,22 @@ void cambiarEstadoTarea(Tarea lista[], int numTareas) {
     }
 
     if (indiceEncontrado != -1) {
+        // variables para el mensaje del cambio
+        char estadoAnterior[20];
+        char estadoNuevo[20];
+
+        // guardamos el estado viejo en la variable
+        strcpy(estadoAnterior, lista[indiceEncontrado].estado.estado);
+
+        // ingresamos el nuevo estado
         printf("Tarea encontrada. Ingrese el nuevo estado: ");
         fgets(lista[indiceEncontrado].estado.estado, sizeof(lista[indiceEncontrado].estado.estado), stdin);
         lista[indiceEncontrado].estado.estado[strcspn(lista[indiceEncontrado].estado.estado, "\n")] = 0;
-        printf("\n¡Estado actualizado con éxito!\n");
+        
+        strcpy(estadoNuevo, lista[indiceEncontrado].estado.estado);
+
+        // mostramos el estado nuevo
+        printf("\nSe cambio el estado de '%s'-> %s\n", estadoAnterior, estadoNuevo);
     } else {
         printf("\nNo se encontró ninguna tarea con el código '%s'.\n", codigoBusqueda);
     }
