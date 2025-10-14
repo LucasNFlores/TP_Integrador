@@ -54,6 +54,9 @@ int main() {
                     printf("\n--- Cargando Nueva Tarea ---\n");
                     cargarUnaTarea(&listaDeTareas[tareasCargadas]);
                     tareasCargadas++;
+
+                    // guardo el archivo
+                    guardarTareasEnArchivo(listaDeTareas, tareasCargadas);
                     printf("\n¡Tarea cargada con éxito!\n");
                 } else {
                     printf("\nNo se pueden agregar más tareas. Límite alcanzado.\n");
@@ -91,7 +94,7 @@ int mostrarMenu() {
     int opcion;
     limpiarPantalla();
     printf("=================================\n");
-    printf("      GESTOR DE TAREAS v1.0\n");
+    printf("      GESTOR DE TAREAS \n");
     printf("=================================\n");
     printf("1. Cargar Nueva Tarea\n");
     printf("2. Mostrar Todas las Tareas\n");
@@ -112,15 +115,15 @@ void buscarPorResponsable(Tarea lista[], int numTareas) {
     printf("\n--- Buscar Tareas por Responsable ---\n");
     printf("Ingrese el nombre del responsable a buscar: ");
 
+    // obtenemos el nombre  
     fgets(nombreBusqueda, sizeof(nombreBusqueda), stdin);
-    nombreBusqueda[strcspn(nombreBusqueda, "\n")] = 0; // Limpiar newline
+    nombreBusqueda[strcspn(nombreBusqueda, "\n")] = 0; // Limpiar newline (\n)
 
     printf("\nResultados de la busqueda para '%s':\n", nombreBusqueda);
     printf("-------------------------------------------\n");
 
     for (int i = 0; i < numTareas; i++) {
         // Usamos strcasecmp para ignorar mayúsculas/minúsculas.
-        // Si no funciona en tu compilador, usa strcmp.
         if (strcasecmp(lista[i].responsable.nombre, nombreBusqueda) == 0) {
             printf("  Codigo: %s\n", lista[i].codigo);
             printf("  Descripcion: %s\n", lista[i].descripcion);
@@ -151,7 +154,16 @@ void cambiarEstadoTarea(Tarea lista[], int numTareas) {
     mostrarTareas(lista, numTareas);
     
     printf("\nIngrese el codigo de la tarea a modificar: ");
+    // Se utiliza fgets para leer la entrada del usuario de forma segura. A diferencia de scanf,
+    // lee la línea completa (incluidos espacios) y previene desbordamientos de memoria
+    // al limitarse al tamaño del array 'codigoBusqueda'.
     fgets(codigoBusqueda, sizeof(codigoBusqueda), stdin);
+    // Esta línea es un truco estándar en C para eliminar el carácter de nueva línea ('\n') 
+    // que fgets captura cuando el usuario presiona Enter. Funciona así:
+    // 1. strcspn(codigoBusqueda, "\n") encuentra el índice (la posición) del '\n'.
+    // 2. Se accede a esa posición en el array 'codigoBusqueda' y se la reemplaza 
+    //    por el terminador nulo ('\0', cuyo valor es 0), que le indica a C que la 
+    //    cadena de texto termina justo en ese punto.
     codigoBusqueda[strcspn(codigoBusqueda, "\n")] = 0;
 
     // Recorremos todas las tareas hasta encontrar la buscada 
@@ -179,12 +191,16 @@ void cambiarEstadoTarea(Tarea lista[], int numTareas) {
         // ingresamos el nuevo estado
         printf("Tarea encontrada. Ingrese el nuevo estado: ");
         fgets(lista[indiceEncontrado].estado.estado, sizeof(lista[indiceEncontrado].estado.estado), stdin);
-        lista[indiceEncontrado].estado.estado[strcspn(lista[indiceEncontrado].estado.estado, "\n")] = 0;
+        
+        // asignamos el estado con strcspn() y limpiamos newLine (\n) con el '= 0'
+        lista[indiceEncontrado].estado.estado[strcspn(lista[indiceEncontrado].estado.estado, "\n")] = 0; 
         
         strcpy(estadoNuevo, lista[indiceEncontrado].estado.estado);
 
         // mostramos el estado nuevo
         printf("\nSe cambio el estado de '%s'-> '%s'\n", estadoAnterior, estadoNuevo);
+
+        guardarTareasEnArchivo(lista, numTareas);
     } else {
         printf("\nNo se encontró ninguna tarea con el código '%s'.\n", codigoBusqueda);
     }
@@ -193,8 +209,13 @@ void cambiarEstadoTarea(Tarea lista[], int numTareas) {
 // --- FUNCIONES DE PERSISTENCIA EN ARCHIVO ---
 
 void guardarTareasEnArchivo(Tarea lista[], int numTareas) {
+    
     FILE *archivo = fopen(NOMBRE_ARCHIVO, "wb"); // "wb" -> Write Binary
+
     if (archivo == NULL) {
+        // casos de error posible:
+        // [Falta de Permisos, Disco Lleno(memoria llena), Nombre de Archivo Inválido, Límite de Archivos Abiertos]
+        // Ruta inexistente: excepcion en caso de que se quiera crear una carpeta (fopen() no puede hacerlo)
         printf("Error: No se pudo abrir el archivo para guardar.\n");
         return;
     }
