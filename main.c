@@ -57,7 +57,7 @@ int main() {
 
                     // guardo el archivo
                     guardarTareasEnArchivo(listaDeTareas, tareasCargadas);
-                    printf("\n ¡Tarea cargada con exito!\n");
+                    printf("\n Tarea cargada con exito\n");
                 } else {
                     printf("\n No se pueden agregar más tareas. Límite alcanzado.\n");
                 }
