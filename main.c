@@ -51,15 +51,15 @@ int main() {
         switch (opcion) {
             case 1:
                 if (tareasCargadas < MAX_TAREAS) {
-                    printf("\n--- Cargando Nueva Tarea ---\n");
+                    printf("\n --- Cargando Nueva Tarea ---\n");
                     cargarUnaTarea(&listaDeTareas[tareasCargadas]);
                     tareasCargadas++;
 
                     // guardo el archivo
                     guardarTareasEnArchivo(listaDeTareas, tareasCargadas);
-                    printf("\n¡Tarea cargada con éxito!\n");
+                    printf("\n ¡Tarea cargada con exito!\n");
                 } else {
-                    printf("\nNo se pueden agregar más tareas. Límite alcanzado.\n");
+                    printf("\n No se pueden agregar más tareas. Límite alcanzado.\n");
                 }
                 presioneParaContinuar();
                 break;
@@ -294,7 +294,7 @@ void cargarUnaTarea(Tarea *tarea) {
     fgets(tarea->responsable.apellido, sizeof(tarea->responsable.apellido), stdin);
     tarea->responsable.apellido[strcspn(tarea->responsable.apellido, "\n")] = 0;
 
-    printf("Ingrese el legajo del responsable: ");
+    printf("Ingrese el legajo del responsable (Ej: 1234): ");
     scanf("%d", &tarea->responsable.legajo);
     // igual que arriba con limpiar buffer eliminamos el \n que agrega scanf
     limpiarBuffer();
@@ -307,17 +307,17 @@ void cargarUnaTarea(Tarea *tarea) {
 void mostrarTareas(Tarea lista[], int numTareas) {
 
     limpiarPantalla();
-    printf("\n--- LISTADO GENERAL DE TAREAS ---\n");
+    printf("\n --- LISTADO GENERAL DE TAREAS ---\n");
     if (numTareas == 0) {
         printf("No hay tareas para mostrar.\n");
         return;
     }
     for (int i = 0; i < numTareas; i++) {
-        printf("----------------------------------\n");
+        printf("---------------------------------- \n");
         printf("  Codigo: %s\n", lista[i].codigo);
         printf("  Descripcion: %s\n", lista[i].descripcion);
-        printf("  Responsable: %s %s (Legajo: %d)\n", lista[i].responsable.nombre, lista[i].responsable.apellido, lista[i].responsable.legajo);
+        printf("  Responsable: %s %s (Legajo: %d) \n", lista[i].responsable.nombre, lista[i].responsable.apellido, lista[i].responsable.legajo);
         printf("  Estado: %s\n", lista[i].estado.estado);
     }
-    printf("----------------------------------\n");
+    printf("---------------------------------- \n");
 }
