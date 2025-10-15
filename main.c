@@ -237,11 +237,14 @@ int cargarTareasDesdeArchivo(Tarea lista[]) {
     }
 
     // Leemos del archivo y guardamos en el array hasta que no haya más que leer
+    // el fread lee un tamaño especifico (el del struct Tarea), en caso de que lo pueda hacer
+    // y el numero de tareas que se va contando sea menor al maximo se suma 1 con 'numTareas++'
     while (fread(&lista[numTareas], sizeof(Tarea), 1, archivo) == 1 && numTareas < MAX_TAREAS) {
         numTareas++;
     }
 
     fclose(archivo);
+    // se devuelve el numero de tareas que se conto en el while
     return numTareas;
 }
 
