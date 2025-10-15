@@ -276,7 +276,7 @@ void presioneParaContinuar() {
 
 void cargarUnaTarea(Tarea *tarea) {
 
-    printf("Ingrese el codigo de la tarea (ej: T01): ");
+    printf("Ingrese el codigo de la tarea (ej: T001): ");
     // se utiliza fgets porque obtiene todo lo que el usuario ingresa hasta apretar ENTER (contrario a scanf que lee hasta donde hay un espacio " ")
     fgets(tarea->codigo, sizeof(tarea->codigo), stdin);
     //asignamos con strcspn a donde apuntaria (en este caso el codigo de la tarea) y eliminar el salto de línea (\n) que fgets agrega al final del texto.
