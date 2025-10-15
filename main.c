@@ -215,7 +215,7 @@ void guardarTareasEnArchivo(Tarea lista[], int numTareas) {
     if (archivo == NULL) {
         // casos de error posible:
         // [Falta de Permisos, Disco Lleno(memoria llena), Nombre de Archivo Inválido, Límite de Archivos Abiertos]
-        // Ruta inexistente: excepcion en caso de que se quiera crear una carpeta (fopen() no puede hacerlo)
+        // Ruta inexistente: excepcion en caso de que se quiera crear una carpeta (fopen() no puede hacerlo) ej: "./carpeta_no_existente/tareas.dat"
         printf("Error: No se pudo abrir el archivo para guardar.\n");
         return;
     }
